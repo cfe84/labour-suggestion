@@ -9,7 +9,16 @@ export class Completion {
     this.keys = Object.keys(this.dictionary)
   }
 
-  private completeAttribute = (beginning: string): string[] =>
+  private isCapitalized = (beginning: string): boolean =>
+    /^[A-Z][a-z]*$/.test(beginning)
+
+  private isUpperCase = (beginning: string): boolean =>
+    /^[A-Z]+$/.test(beginning)
+
+  private capitalize = (word: string): string =>
+    word[0].toUpperCase() + word.substr(1, word.length - 1).toLowerCase()
+
+  private completeWord = (beginning: string): string[] =>
     this.keys
       .filter(key => key.startsWith(beginning.toLowerCase()))
       .map(key => this.dictionary[key])
@@ -27,6 +36,13 @@ export class Completion {
     if (currentWordBeginning === "") {
       return []
     }
-    return this.completeAttribute(currentWordBeginning)
+    const completions = this.completeWord(currentWordBeginning)
+    if (this.isCapitalized(currentWordBeginning)) {
+      return completions.map(word => this.capitalize(word))
+    }
+    if (this.isUpperCase(currentWordBeginning)) {
+      return completions.map(word => word.toUpperCase())
+    }
+    return completions
   }
 }

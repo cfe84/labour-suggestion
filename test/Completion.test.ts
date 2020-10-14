@@ -22,11 +22,17 @@ describe("Completion", () => {
     it("proposes all words", () => {
       const completions = completion.complete("This ", 5)
     })
-    it("proposes corresponding words (2 letters, ignore case)", () => {
+    it("proposes corresponding words (2 letters, capitalized)", () => {
       const completions = completion.complete("This Ho", 7)
-      should(completions).containEql("hello")
-      should(completions).containEql("hotel")
-      should(completions).not.containEql("noticed")
+      should(completions).containEql("Hello")
+      should(completions).containEql("Hotel")
+      should(completions).not.containEql("Noticed")
+    })
+    it("proposes corresponding words (2 letters, upper case)", () => {
+      const completions = completion.complete("This HO", 7)
+      should(completions).containEql("HELLO")
+      should(completions).containEql("HOTEL")
+      should(completions).not.containEql("NOTICED")
     })
     it("proposes corresponding words (1 letter)", () => {
       const completions = completion.complete("This n", 6)
@@ -35,6 +41,12 @@ describe("Completion", () => {
       should(completions).not.containEql("attention")
     })
 
+    it("proposes corresponding words (1 letter capitalized)", () => {
+      const completions = completion.complete("This N", 6)
+      should(completions).containEql("Noticed")
+      should(completions).containEql("Notion")
+      should(completions).not.containEql("Attention")
+    })
     it("proposes corresponding words and filter out others", () => {
       const completions = completion.complete("This nd", 7)
       should(completions).containEql("noticed")
