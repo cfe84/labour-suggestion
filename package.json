@@ -26,7 +26,22 @@
 					".markdown"
 				]
 			}
-		]
+		],
+		"configuration": {
+			"title": "Labour Suggestion",
+			"properties": {
+				"ls.dictionary": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [
+						"ho:hello"
+					],
+					"markdownDescription": "Substitutions dictionary - use `shortcut:word` format *(e.g ho:hello)*"
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run build",
