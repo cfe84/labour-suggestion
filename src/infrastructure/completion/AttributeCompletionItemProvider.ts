@@ -17,7 +17,7 @@ export class AttributeCompletionItemProvider implements vscode.CompletionItemPro
       }
       dictionary[split[0]] = split[1]
     })
-    this.log.log(`Reloaded configuration`)
+    this.log.log(`Reloaded configuration - ${JSON.stringify(dictionary)}`)
     this.completion = new Completion(dictionary, this.log)
   }
 
@@ -29,6 +29,11 @@ export class AttributeCompletionItemProvider implements vscode.CompletionItemPro
   }
 
   provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
-    return this.completion.complete(document.lineAt(position.line).text, position.character).map(proposition => ({ label: proposition }))
+    return this.completion
+      .complete(document.lineAt(position.line).text, position.character)
+      .map((proposition, idx) => ({
+        label: proposition,
+        preselect: idx === 0
+      }))
   }
 }
