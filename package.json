@@ -30,6 +30,11 @@
 		"configuration": {
 			"title": "Labour Suggestion",
 			"properties": {
+				"ls.filePath": {
+					"type": "string",
+					"default": "",
+					"markdownDescription": "File containing a substitutions dictionary - use `[{'shortcut': 'ho', 'word': 'hello'}]` format."
+				},
 				"ls.dictionary": {
 					"type": "array",
 					"items": {
@@ -38,7 +43,7 @@
 					"default": [
 						"ho:hello"
 					],
-					"markdownDescription": "Substitutions dictionary - use `shortcut:word` format *(e.g ho:hello)*"
+					"markdownDescription": "Substitutions dictionary. Deactivated if file is specified - use `shortcut:word` format *(e.g ho:hello)*"
 				}
 			}
 		}

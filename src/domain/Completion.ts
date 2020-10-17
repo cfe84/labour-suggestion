@@ -1,6 +1,6 @@
 import { ILogger } from "./ILogger"
 
-type Dictionary = { [key: string]: string }
+export type Dictionary = { [key: string]: string }
 
 export class Completion {
   private keys: string[]
