@@ -33,7 +33,7 @@
 				"ls.filePath": {
 					"type": "string",
 					"default": "",
-					"markdownDescription": "File containing a substitutions dictionary - use `[{'shortcut': 'ho', 'word': 'hello'}]` format."
+					"markdownDescription": "File containing a substitutions dictionary - use `{'substitutions': [{'shortcut': 'ho', 'word': 'hello'}]}` format."
 				},
 				"ls.dictionary": {
 					"type": "array",

@@ -1,0 +1,20 @@
+{
+  "substitutions": [
+    {
+      "shortcut": "ho",
+      "word": "hello"
+    },
+    {
+      "shortcut": "rgds",
+      "word": "regards"
+    },
+    {
+      "shortcut": "authn",
+      "word": "authentication"
+    },
+    {
+      "shortcut": "authz",
+      "word": "authorization"
+    }
+  ]
+}

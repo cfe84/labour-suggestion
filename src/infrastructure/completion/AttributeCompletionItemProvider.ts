@@ -5,12 +5,22 @@ import * as fs from "fs"
 
 export const AttributeCompletionTriggerCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+interface SuggestionFileRecord {
+  shortcut: string
+  word: string
+}
+
+interface SuggestionFile {
+  substitutions: SuggestionFileRecord[]
+}
+
 export class AttributeCompletionItemProvider implements vscode.CompletionItemProvider {
   private completion!: Completion
   private loadedFile: string | undefined
   private watcher: fs.FSWatcher | undefined
 
   private loadDictionaryFromConfiguration(): Dictionary {
+    this.log.log(`Loading from configuration`)
     const configuration = vscode.workspace.getConfiguration("ls").get("dictionary") as string[]
     const dictionary: { [key: string]: string } = {}
     configuration.forEach(entry => {
@@ -23,28 +33,59 @@ export class AttributeCompletionItemProvider implements vscode.CompletionItemPro
     return dictionary
   }
 
-  private loadDictionaryFromFile(file: string) {
+  private loadDictionaryFromFile(file: string): Dictionary {
+    this.log.log(`Loading from file ${file}`)
     const content = fs.readFileSync(file)
-    const dictionary = JSON.parse(`${content}`)
+    const suggestionFile = JSON.parse(`${content}`) as SuggestionFile
+    if (!suggestionFile.substitutions) {
+      this.log.error(`File is incorrect: No "substitutions" node found`)
+      return {}
+    }
+    if (!Array.isArray(suggestionFile.substitutions)) {
+      this.log.error(`File is incorrect: "substitutions" is not an array`)
+      return {}
+    }
+    const dictionary: Dictionary = {}
+    suggestionFile.substitutions.forEach(substitution => {
+      if (substitution.shortcut && substitution.word) {
+        dictionary[substitution.shortcut] = substitution.word
+      } else {
+        this.log.warn(`Substitution ${JSON.stringify(substitution)} has an invalid format. Expecting properties 'shortcut' and 'word'. Skipping it`)
+      }
+    })
     return dictionary
   }
 
   private loadCompletion = () => {
-    const dictionary = this.loadedFile ? this.loadDictionaryFromFile(this.loadedFile) : this.loadDictionaryFromConfiguration()
+    const dictionary = this.loadedFile
+      ? this.loadDictionaryFromFile(this.loadedFile)
+      : this.loadDictionaryFromConfiguration()
     this.log.log(`Reloaded configuration`)
     this.completion = new Completion(dictionary, this.log)
   }
 
   private configChanged = () => {
     const file = vscode.workspace.getConfiguration("ls").get("filePath") as string
+    if (this.loadedFile) {
+
+    }
     if (file && this.loadedFile !== file) {
       if (this.watcher) {
         this.watcher.close()
+        this.watcher = undefined
       }
-      this.watcher = fs.watch(file, {}, () => {
-        this.loadCompletion()
-      })
-      this.loadedFile = file
+      if (fs.existsSync(file)) {
+        this.watcher = fs.watch(file, {}, () => {
+          this.loadCompletion()
+        })
+        this.loadedFile = file
+      } else {
+        this.log.error(`File: ${file} not found - loading from configuration instead`)
+        this.loadedFile = undefined
+      }
+    } else {
+      // Clear loaded file so we load from configuration
+      this.loadedFile = undefined
     }
     this.loadCompletion()
   }
